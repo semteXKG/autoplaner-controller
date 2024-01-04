@@ -1,8 +1,7 @@
 #include <MenuHandler.h>
 
-MenuHandler::MenuHandler(SharedData* sharedData, LockController* lockController) {
+MenuHandler::MenuHandler(SharedData* sharedData) {
     this->sharedData = sharedData;
-    this->lockController = lockController;
     menu[0] = strdup("1. Offset Adjust");
     menu[1] = strdup("2. LCK Status");
     menu[2] = strdup("3. LCK Operation");
@@ -57,18 +56,18 @@ void MenuHandler::handleEnterPressed() {
             break;
         case 1: 
             if (sharedData->isLocked()) {
-                lockController->unlock(true);
+//                lockController->unlock(true);
             } else {
-                lockController->lock(true);
+//                lockController->lock(true);
             }
 
             sharedData->switchState(MachineState::IDLE);        
             break;
         case 2: 
             if (sharedData->isLocked()) {
-                lockController->unlock(false);
+//                lockController->unlock(false);
             } else {
-                lockController->lock(false);
+//                lockController->lock(false);
             }
             sharedData->switchState(MachineState::IDLE);        
             break;

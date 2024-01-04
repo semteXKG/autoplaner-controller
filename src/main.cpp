@@ -4,22 +4,15 @@
 #include <TargetSelector.h>
 #include <Display.h>
 #include <SharedData.h>
-#include <EnvironmentSensors.h>
 #include <HardwareButtonManager.h>
-#include <Calibrator.h>
-#include <StepperController.h>
-#include <LockController.h>
-#include <CalibrationOffsetHandler.h>
 #include <MenuHandler.h>
 #include <ArduinoNvs.h>
-#include <FastAccelStepper.h>
 #include <Communicator.h>
 
 #define DEBUG ""
 
 static const gpio_num_t SPEED_BUTTON = GPIO_NUM_12;
 static const gpio_num_t GO_BUTTON = GPIO_NUM_14;
-static const gpio_num_t BOTTOM_OUT_BUTTON = GPIO_NUM_27;
 static const gpio_num_t MOVE_TO_CONVERSION_BUTTON = GPIO_NUM_16;
 
 static const gpio_num_t HEIGHT_STEPPER_PULSE = GPIO_NUM_33;
@@ -32,14 +25,8 @@ static const gpio_num_t LOCK_STEPPER_DIR = GPIO_NUM_2;
 Display* display;
 TargetSelector* inputManager;
 SharedData* sharedData;
-EnvironmentSensors* environmentSensors;
 HardwareButtonManager* buttonManager;
-Calibrator* calibrator;
-StepperController* stepperController;
-LockController* lockController;
-CalibrationOffsetHandler* calibrationOffsetHandler;
 MenuHandler* menuHandler;
-FastAccelStepperEngine* engine;
 Communicator* communicator;
 
 void setup() {
@@ -49,18 +36,11 @@ void setup() {
 		ESP.restart();
 	}
 
-	engine = new FastAccelStepperEngine();
-	engine->init();
 	sharedData = new SharedData();
 	inputManager = new TargetSelector(18, 19, sharedData);
-	buttonManager = new HardwareButtonManager(GO_BUTTON, BOTTOM_OUT_BUTTON, SPEED_BUTTON, MOVE_TO_CONVERSION_BUTTON, sharedData);
-	environmentSensors = new EnvironmentSensors(sharedData);
+	buttonManager = new HardwareButtonManager(GO_BUTTON, SPEED_BUTTON, MOVE_TO_CONVERSION_BUTTON, sharedData);
 	display = new Display(sharedData);
-	stepperController = new StepperController(sharedData, engine, HEIGHT_STEPPER_PULSE, HEIGHT_STEPPER_DIR);
-	lockController = new LockController(sharedData, engine, LOCK_STEPPER_PULSE, LOCK_STEPPER_DIR);
-	calibrator = new Calibrator(sharedData, lockController);
-	calibrationOffsetHandler = new CalibrationOffsetHandler(sharedData);
-	menuHandler = new MenuHandler(sharedData, lockController);
+	menuHandler = new MenuHandler(sharedData);
 	communicator = new Communicator(sharedData);
 	sharedData->scheduleDisplayUpdate();
 //	sharedData->switchState(MachineState::CALIBRATION_NEEDED);
@@ -70,14 +50,8 @@ void setup() {
 
 void loop() {
 	buttonManager->tick();
-	environmentSensors->tick();
 	inputManager->tick();
-	environmentSensors->tick();
-	calibrator->tick();
 	display->tick();
-	stepperController->tick();
-	lockController->tick();
-	calibrationOffsetHandler->tick();
 	menuHandler->tick();
 	communicator->tick();
 }
