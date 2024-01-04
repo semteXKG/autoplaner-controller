@@ -1,7 +1,12 @@
 #include <TargetSelector.h>
 
 TargetSelector::TargetSelector(int pin1, int pin2, SharedData* sharedData) {
-    this->encoder = new RotaryEncoder(pin1, pin2, RotaryEncoder::LatchMode::TWO03);
+    ESP32Encoder::useInternalWeakPullResistors=UP;
+	this->encoder = new ESP32Encoder();	
+  	encoder->attachFullQuad(pin1, pin2);
+	encoder->clearCount();
+    encoder->setFilter(1023);
+
     this->sharedData = sharedData;
 	this->prevEncPosition = 0;
 }
@@ -12,38 +17,38 @@ TargetSelector::~TargetSelector() {
 
 void TargetSelector::handleEncoder() {
 	sharedData->setLastRotation(0);
-    encoder->tick();
-	// Loop and read the count
-	int newPos = encoder->getPosition();
+    // Loop and read the count
+	int newPos = encoder->getCount() / 4;
 
-
- 	unsigned long ms = encoder->getMillisBetweenRotations();
-
-	if(encoder->getPosition() == prevEncPosition) {
+	if(newPos == prevEncPosition) {
 		return;
 	}
 
-	bool fastMode = sharedData->evaluateFastmodeEnablement(ms);
-
-	int32_t delta = encoder->getPosition() - prevEncPosition;	
+	int32_t delta = newPos - prevEncPosition;	
 	sharedData->setLastRotation(delta);
-	prevEncPosition = encoder->getPosition();	
+	prevEncPosition = newPos;	
+	
+	Serial.print("delta: ");
+	Serial.println(delta);
 
 	if(this->sharedData->getState() != MachineState::IDLE && this->sharedData->getState() != MachineState::SETTINGS_OFFSET_ADJUSTING) {
 		return;
 	}
 
+	lastTimestamps[currentInputPosition % MAX_INPUTS] = millis();
+
+	boolean fastMode = evaluateFastMode();
+	
 	long increment;
 	if (sharedData->speedButton->isPressed()) {
 		increment =  INCREMENT_SLOW_IN_DENOM;
 	} else if (fastMode) {
-		increment = INCREMENT_NORMAL_IN_DENOM * 4;
+		increment = INCREMENT_NORMAL_IN_DENOM * 2;
 	} else {
 		increment = INCREMENT_NORMAL_IN_DENOM;
 	}
 
 	lastValues[currentInputPosition % MAX_INPUTS] = delta * increment;
-	lastTimestamps[currentInputPosition % MAX_INPUTS] = millis();
 	currentInputPosition++;
 
 	if(sharedData->getState() == MachineState::IDLE) {
@@ -55,6 +60,23 @@ void TargetSelector::handleEncoder() {
 	sharedData->scheduleDisplayUpdate();
 }
 
+boolean TargetSelector::evaluateFastMode() {
+//	Serial.print("Element: ");
+//	Serial.println(currentInputPosition % MAX_INPUTS);
+//	Serial.print("Last Index: ");
+//	Serial.println();
+	int lastIndex = (currentInputPosition-3) % MAX_INPUTS;
+	int currentIndex = (currentInputPosition) % MAX_INPUTS;
+	if(lastIndex < 0) {
+		lastIndex += MAX_INPUT;
+	}
+	
+	long currentElement = lastTimestamps[currentIndex];
+	long prevElement = lastTimestamps[lastIndex];
+//	Serial.print("DIFF:");
+//	Serial.println(currentElement - prevElement);
+	return currentElement - prevElement < 200;
+}
 
 void TargetSelector::handleInputSelectionButton() {
 	if (sharedData->getState() == IDLE) {

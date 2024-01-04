@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
-#include <RotaryEncoder.h>
 #include <TargetSelector.h>
 #include <Display.h>
 #include <SharedData.h>
