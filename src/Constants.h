@@ -38,6 +38,7 @@ static const int TIMEOUT_MOVE_TO_CONVERSION = 500;
 static const char* CAL_NEEDED_TEXT = "Calib needed";
 static const char* CAL_RUNNING_TEXT = "Calibrating.";
 static const char* MOVING_TEXT = "moving...";
+static const char* WAITING_FOR_CONFIG_TEXT = "W8 4 Conf";
 
 static const char* LOCKING_TEXT = "locking";
 static const char* UNLOCKING_TEXT = "unlocking";
@@ -57,7 +58,8 @@ static unsigned char unlocked_bits[] = {
 
 
  static const char *machineStateDesc[] =
-{ "CALIBRATION_NEEDED", 
+{ "CONFIG_NEEDED", 
+"CALIBRATION_NEEDED", 
 "PREP CALIBRATION",
 "CALIBRATING", 
 "IDLE", 
@@ -77,6 +79,7 @@ static unsigned char unlocked_bits[] = {
 
 
 enum MachineState {
+    CONFIG_NEEDED,
     CALIBRATION_NEEDED,
     PREP_CALIBRATION, 
     CALIBRATING,

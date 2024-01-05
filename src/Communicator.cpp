@@ -61,10 +61,15 @@ Communicator::~Communicator()
 void Communicator::updateBackingData(BackingData newBackingData) {
   memcpy(&previousBackingData, &newBackingData, sizeof(BackingData));
   sharedData->setBackingData(newBackingData);
+  sharedData->scheduleDisplayUpdate();
 }
 
 void Communicator::tick()
 {
+  if (sharedData->getState() == CONFIG_NEEDED) {
+    return; 
+  }
+
   BackingData currentBackingData = sharedData->getBackingData();
   if (isChanged(currentBackingData, previousBackingData))
   {

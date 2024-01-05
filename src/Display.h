@@ -15,6 +15,7 @@ private:
     void updateLockingText();
     void updateUnlockingText();
     void updateMovingText();
+    void updateWaitingForConfigText();
     void printBorder();
     void printPrevious();
     void printLockState();

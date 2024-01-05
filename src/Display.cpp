@@ -82,6 +82,10 @@ void Display::updateMovingText() {
 	printCenterText(MOVING_TEXT, 10);
 }
 
+void Display::updateWaitingForConfigText() {
+	printCenterText(WAITING_FOR_CONFIG_TEXT, 8);
+}
+
 bool Display::updateBlinkState() {
 	if (sharedData->getState() == MachineState::SETTINGS_OFFSET_ADJUSTING) {
 		bool currentState = (millis() / 250) % 4;
@@ -143,6 +147,9 @@ void Display::tick() {
 		u8g2->clearBuffer();
 		printBorder();
 		switch(this->sharedData->getState()) {
+			case MachineState::CONFIG_NEEDED:
+				updateWaitingForConfigText();
+				break;
 			case MachineState::CALIBRATION_NEEDED: 
 				updateCalibrationText();
 				break;

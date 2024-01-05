@@ -7,6 +7,7 @@
 #include <MenuHandler.h>
 #include <ArduinoNvs.h>
 #include <Communicator.h>
+#include <CalibrationOffsetHandler.h>
 
 #define DEBUG ""
 
@@ -26,6 +27,7 @@ TargetSelector* inputManager;
 SharedData* sharedData;
 HardwareButtonManager* buttonManager;
 MenuHandler* menuHandler;
+CalibrationOffsetHandler* calibrationOffsetHandler;
 Communicator* communicator;
 
 void setup() {
@@ -40,10 +42,11 @@ void setup() {
 	buttonManager = new HardwareButtonManager(GO_BUTTON, SPEED_BUTTON, MOVE_TO_CONVERSION_BUTTON, sharedData);
 	display = new Display(sharedData);
 	menuHandler = new MenuHandler(sharedData);
+	calibrationOffsetHandler = new CalibrationOffsetHandler(sharedData);
 	communicator = new Communicator(sharedData);
 	sharedData->scheduleDisplayUpdate();
 //	sharedData->switchState(MachineState::CALIBRATION_NEEDED);
-	sharedData->switchState(MachineState::IDLE);
+	sharedData->switchState(MachineState::CONFIG_NEEDED);
 }
 
 
@@ -53,4 +56,5 @@ void loop() {
 	display->tick();
 	menuHandler->tick();
 	communicator->tick();
+	calibrationOffsetHandler->tick();
 }
