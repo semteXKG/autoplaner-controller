@@ -45,7 +45,6 @@ void setup() {
 	calibrationOffsetHandler = new CalibrationOffsetHandler(sharedData);
 	communicator = new Communicator(sharedData);
 	sharedData->scheduleDisplayUpdate();
-//	sharedData->switchState(MachineState::CALIBRATION_NEEDED);
 	sharedData->switchState(MachineState::CONFIG_NEEDED);
 }
 
