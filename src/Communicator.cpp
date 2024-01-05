@@ -84,34 +84,39 @@ boolean Communicator::isChanged(BackingData* currentData, BackingData* previousD
 {
   if (currentData->calibrationDone != previousData->calibrationDone)
   {
-    Serial.println("calibrationDone");
+    Serial.println("Locally modified: calibrationDone");
+    return true;
+  }
+  if (currentData->calibrationStart != previousData->calibrationStart)
+  {
+    Serial.println("Locally modified: calibrationStart");
     return true;
   }
   if (currentData->currentPosition != previousData->currentPosition)
   {
-    Serial.println("currentPosition");
+    Serial.println("Locally modified: currentPosition");
     return true;
   }
 
   if (currentData->locked != previousData->locked)
   {
-    Serial.println("locked");
+    Serial.println("Locally modified: locked");
     return true;
   }
 
   if (currentData->offset != previousData->offset)
   {
-    Serial.println("offset");
+    Serial.println("Locally modified: offset");
     return true;
   }
   if (currentData->state != previousData->state)
   {
-    Serial.println("state");
+    Serial.println("Locally modified: state");
     return true;
   }
   if (currentData->targetPosition != previousData->targetPosition)
   {
-    Serial.println("targetPosition");
+    Serial.println("Locally modified: targetPosition");
     return true;
   }
   return false;

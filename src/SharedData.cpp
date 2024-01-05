@@ -3,6 +3,10 @@
 
 SharedData::SharedData() {
     backingData = (BackingData*) malloc(sizeof(BackingData));
+    backingData->calibrationDone = false;
+    backingData->calibrationStart = false;
+    backingData->locked = 0;
+    backingData->offset = 0;
     backingData->currentPosition = MIN_POSITION;
     backingData->targetPosition = backingData->currentPosition;
     backingData->state = MachineState::CALIBRATION_NEEDED;
@@ -46,6 +50,14 @@ int SharedData::getOffset() {
     return backingData->offset;
 }
 
+void SharedData::setPreviousOffset(int prevOffset) {
+    previousOffset = prevOffset;
+}
+
+int SharedData::getPreviousOffset() {
+    return previousOffset;
+}
+
 long SharedData::getLastDistance() {
     return lastDistance;
 }
@@ -85,6 +97,10 @@ void SharedData::setLocked(bool locked) {
 
 void SharedData::markCalibrationDone() {
     backingData->calibrationDone = true;
+}
+
+void SharedData::markCalibratinStart() {
+    backingData->calibrationStart = true;
 }
 
 void SharedData::scheduleDisplayUpdate() {

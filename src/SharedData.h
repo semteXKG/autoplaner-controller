@@ -9,8 +9,9 @@ struct BackingData
     long targetPosition;
     long currentPosition;
     int offset;
-    bool locked = false;
-    bool calibrationDone = false;
+    bool locked;
+    bool calibrationDone;
+    bool calibrationStart;
     MachineState state;
 };
 
@@ -23,6 +24,7 @@ class SharedData {
         long nextDisplayUpdate = -1;
         int lastRotation = 0;
         long lastDistance = 0;
+        int previousOffset;
     public:
         SharedData();
         ~SharedData();
@@ -36,6 +38,8 @@ class SharedData {
         void setPosition(long position);
         void setOffset(int offset);
         int getOffset();
+        void setPreviousOffset(int offset);
+        int getPreviousOffset();
         long getLastDistance();
         void setLastDistance(long lastDistance);
         void setMenuEntries(char* upper, char* mid, char* low);
@@ -45,6 +49,7 @@ class SharedData {
         bool isLocked();
         void setLocked(bool locked);
         void markCalibrationDone();
+        void markCalibratinStart();
         void scheduleDisplayUpdate();
         bool shouldUpdateDisplay();
         void switchState(MachineState state);

@@ -19,5 +19,4 @@ public:
     void updateBackingData(BackingData* backingData);
 };
 
-
 #endif

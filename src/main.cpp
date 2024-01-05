@@ -5,7 +5,6 @@
 #include <SharedData.h>
 #include <HardwareButtonManager.h>
 #include <MenuHandler.h>
-#include <ArduinoNvs.h>
 #include <Communicator.h>
 #include <CalibrationOffsetHandler.h>
 
@@ -32,11 +31,6 @@ Communicator* communicator;
 
 void setup() {
 	Serial.begin(115200);
-	
-	if (!NVS.begin("planer")) {
-		ESP.restart();
-	}
-
 	sharedData = new SharedData();
 	inputManager = new TargetSelector(18, 19, sharedData);
 	buttonManager = new HardwareButtonManager(GO_BUTTON, SPEED_BUTTON, MOVE_TO_CONVERSION_BUTTON, sharedData);
