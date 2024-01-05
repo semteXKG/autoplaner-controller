@@ -2,9 +2,10 @@
 #include <Arduino.h>
 
 SharedData::SharedData() {
-    backingData.currentPosition = MIN_POSITION;
-    backingData.targetPosition = backingData.currentPosition;
-    backingData.state = MachineState::CALIBRATION_NEEDED;
+    backingData = (BackingData*) malloc(sizeof(BackingData));
+    backingData->currentPosition = MIN_POSITION;
+    backingData->targetPosition = backingData->currentPosition;
+    backingData->state = MachineState::CALIBRATION_NEEDED;
 }
 
 SharedData::~SharedData() {
@@ -12,24 +13,24 @@ SharedData::~SharedData() {
 }
 
 long SharedData::getTargetPosition() {
-    return backingData.targetPosition;
+    return backingData->targetPosition;
 }
 
 void SharedData::setTargetPosition(long targetPosition) {
-    backingData.targetPosition = targetPosition;
-    if(backingData.targetPosition < MIN_POSITION) {
-		backingData.targetPosition = MIN_POSITION;
-	} else if (backingData.targetPosition > MAX_POSITION) {
-		backingData.targetPosition = MAX_POSITION;
+    backingData->targetPosition = targetPosition;
+    if(backingData->targetPosition < MIN_POSITION) {
+		backingData->targetPosition = MIN_POSITION;
+	} else if (backingData->targetPosition > MAX_POSITION) {
+		backingData->targetPosition = MAX_POSITION;
 	}
 }
 
 long SharedData::getCurrentPosition() {
-    return backingData.currentPosition;
+    return backingData->currentPosition;
 }
 
 void SharedData::setCurrentPosition(long currentPosition) {
-    backingData.currentPosition = currentPosition;
+    backingData->currentPosition = currentPosition;
 }
 
 void SharedData::setPosition(long position) {
@@ -38,11 +39,11 @@ void SharedData::setPosition(long position) {
 }
 
 void SharedData::setOffset(int offset) {
-    backingData.offset = offset;
+    backingData->offset = offset;
 }
 
 int SharedData::getOffset() {
-    return backingData.offset;
+    return backingData->offset;
 }
 
 long SharedData::getLastDistance() {
@@ -72,18 +73,18 @@ int SharedData::getLastRotation() {
 }
 
 bool SharedData::isLocked() {
-    return backingData.locked;
+    return backingData->locked;
 }
 
 void SharedData::setLocked(bool locked) {
     Serial.print("locked: ");
     Serial.println(locked);
-    backingData.locked = locked;
+    backingData->locked = locked;
     scheduleDisplayUpdate();
 }
 
 void SharedData::markCalibrationDone() {
-    backingData.calibrationDone = true;
+    backingData->calibrationDone = true;
 }
 
 void SharedData::scheduleDisplayUpdate() {
@@ -101,11 +102,11 @@ bool SharedData::shouldUpdateDisplay() {
 }
 
 MachineState SharedData::getState() {
-    return backingData.state;
+    return backingData->state;
 }
 
 void SharedData::switchState(MachineState state) {
-    if(state == IDLE && !backingData.calibrationDone) {
+    if(state == IDLE && !backingData->calibrationDone) {
         Serial.print("Cannot go idle without calibration ");
         state = MachineState::CALIBRATION_NEEDED;
     }
@@ -114,23 +115,16 @@ void SharedData::switchState(MachineState state) {
     Serial.print(" - ");
     Serial.println(machineStateDesc[state]);
     
-    backingData.state = state;
+    backingData->state = state;
     scheduleDisplayUpdate();
 }
 
-bool SharedData::evaluateFastmodeEnablement(long msSinceLast) {
-    if (msSinceLast < INPUT_QUALIFIES_AS_FASTMODE) {
-        rapidInputReceived++;
-    } else {
-        rapidInputReceived = 0;
-    }
-    return rapidInputReceived > 2;
-}
-
-BackingData SharedData::getBackingData() {
+BackingData* SharedData::getBackingData() {
     return backingData;
 }
 
-void SharedData::setBackingData(BackingData newBackingData) {
-    memcpy(&backingData, &newBackingData, sizeof(BackingData));
+void SharedData::setBackingData(BackingData* newBackingData) {
+    BackingData* currentBackingData = backingData;
+    this->backingData = newBackingData;
+    free(currentBackingData);
 }

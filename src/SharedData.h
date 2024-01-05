@@ -18,7 +18,7 @@ struct BackingData
 
 class SharedData {
     private:
-        BackingData backingData;
+        BackingData* backingData;
         char* menuEntries[3];
         int rapidInputReceived = 0;
         long nextDisplayUpdate = -1;
@@ -49,10 +49,9 @@ class SharedData {
         void scheduleDisplayUpdate();
         bool shouldUpdateDisplay();
         void switchState(MachineState state);
-        bool evaluateFastmodeEnablement(long msSinceLast);
         MachineState getState();
-        BackingData getBackingData();
-        void setBackingData(BackingData backingData);
+        BackingData* getBackingData();
+        void setBackingData(BackingData* backingData);
 };
 
 #endif
