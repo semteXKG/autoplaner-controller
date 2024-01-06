@@ -102,9 +102,10 @@ void Display::printBorder() {
 }
 
 void Display::printPrevious() {
+	double value = sharedData->getLastDistance() / (DENOMINATION*1.0);
 	u8g2->setFont(u8g2_font_profont11_tr);
 	char output[20];	
-	sprintf(&output[0], "Prev: %03.1f", sharedData->getLastDistance() / DENOMINATION);
+	sprintf(&output[0], "Prev: %03.1f", value);
 	int width = u8g2->getUTF8Width(output);
 	u8g2->drawStr(u8g2->getDisplayWidth() - width - 4, u8g2->getMaxCharHeight() + 1, output);
 }

@@ -46,7 +46,8 @@ void TargetSelector::handleEncoder() {
 	}
 
 	long totalDelta = factor * delta;
-
+	totalDelta = correctFractionValues(sharedData->getTargetPosition(), totalDelta, sharedData->speedButton->isPressed());
+	
 	lastValues[currentInputPosition % MAX_INPUTS] = totalDelta;
 	currentInputPosition++;
 

@@ -7,8 +7,9 @@ Communicator *globalCommunicator;
 
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
-  Serial.print("Packet Send Status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+  if(status != ESP_NOW_SEND_SUCCESS) {
+    Serial.println("Packet Send Status:\tDelivery Fail");
+  }
 }
 
 // Callback when data is received
@@ -60,6 +61,9 @@ Communicator::~Communicator()
 void Communicator::updateBackingData(BackingData* newBackingData) {
   std::lock_guard<std::mutex> lck(lockMutex);
   memcpy(previousBackingData, newBackingData, sizeof(BackingData));
+
+  printDiffChanges(true, newBackingData, sharedData->getBackingData());
+
   sharedData->setBackingData(newBackingData);
   sharedData->scheduleDisplayUpdate();
 }
@@ -75,16 +79,16 @@ void Communicator::tick()
   BackingData* currentBackingData = sharedData->getBackingData();
   if (isChanged(currentBackingData, previousBackingData))
   {
-    printDiffChanges(currentBackingData, previousBackingData);
+    printDiffChanges(false, currentBackingData, previousBackingData);
     esp_now_send(broadcastAddress, (uint8_t *)currentBackingData, sizeof(BackingData));
     memcpy(previousBackingData, currentBackingData, sizeof(BackingData));
   }
 }
 
-void Communicator::printDiffChanges(BackingData* newData, BackingData* existingData) {
+void Communicator::printDiffChanges(boolean fromRemote, BackingData* newData, BackingData* existingData) {
   if(memcmp(newData, existingData, sizeof(BackingData)) != 0) {
-    Serial.printf("State:\t%s,\ttarget:\t%d,\tcurrent:\t%d,\toffset:\t%d,\tlocked:\t%d,\tcalibrationDone:\t%d,\tcalibrationStart:\t%d\n", 
-      machineStateDesc[newData->state], newData->targetPosition, newData->currentPosition, newData->offset, newData->locked, newData->calibrationDone, newData->calibrationStart);
+    Serial.printf("Remote:\t%d,\tState:\t%s,\ttarget:\t%d,\tcurrent:\t%d,\toffset:\t%d,\tlocked:\t%d,\tcalibrationDone:\t%d,\tcalibrationStart:\t%d\n", 
+      fromRemote, machineStateDesc[newData->state], newData->targetPosition, newData->currentPosition, newData->offset, newData->locked, newData->calibrationDone, newData->calibrationStart);
   }
 }
 
