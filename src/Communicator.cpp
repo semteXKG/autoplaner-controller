@@ -75,8 +75,16 @@ void Communicator::tick()
   BackingData* currentBackingData = sharedData->getBackingData();
   if (isChanged(currentBackingData, previousBackingData))
   {
+    printDiffChanges(currentBackingData, previousBackingData);
     esp_now_send(broadcastAddress, (uint8_t *)currentBackingData, sizeof(BackingData));
     memcpy(previousBackingData, currentBackingData, sizeof(BackingData));
+  }
+}
+
+void Communicator::printDiffChanges(BackingData* newData, BackingData* existingData) {
+  if(memcmp(newData, existingData, sizeof(BackingData)) != 0) {
+    Serial.printf("State:\t%s,\ttarget:\t%d,\tcurrent:\t%d,\toffset:\t%d,\tlocked:\t%d,\tcalibrationDone:\t%d,\tcalibrationStart:\t%d\n", 
+      machineStateDesc[newData->state], newData->targetPosition, newData->currentPosition, newData->offset, newData->locked, newData->calibrationDone, newData->calibrationStart);
   }
 }
 

@@ -142,5 +142,6 @@ BackingData* SharedData::getBackingData() {
 void SharedData::setBackingData(BackingData* newBackingData) {
     BackingData* currentBackingData = backingData;
     this->backingData = newBackingData;
+    this->previousOffset = backingData->offset;
     free(currentBackingData);
 }

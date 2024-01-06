@@ -12,6 +12,7 @@ private:
     BackingData* previousBackingData;
     std::mutex lockMutex;
     boolean isChanged(BackingData* currentData, BackingData* previousData);
+    void printDiffChanges(BackingData* newData, BackingData* existingData);
 public:
     Communicator(SharedData* sharedData);
     ~Communicator();

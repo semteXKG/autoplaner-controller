@@ -45,9 +45,9 @@ void setup() {
 
 void loop() {
 	buttonManager->tick();
+	calibrationOffsetHandler->tick();
 	inputManager->tick();
 	display->tick();
 	menuHandler->tick();
 	communicator->tick();
-	calibrationOffsetHandler->tick();
 }

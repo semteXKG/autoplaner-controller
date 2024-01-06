@@ -5,16 +5,16 @@ HardwareButtonManager::HardwareButtonManager(gpio_num_t enterButtonPin, gpio_num
 
     Bounce2::Button* enterButton = new Bounce2::Button();
     enterButton->setPressedState(LOW);
-    enterButton->interval(5);
+    enterButton->interval(50);
     enterButton->attach(enterButtonPin, INPUT_PULLUP);
 
     Bounce2::Button* speedButton = new Bounce2::Button();
     speedButton->setPressedState(LOW);
-    enterButton->interval(5);
+    speedButton->interval(50);
     speedButton->attach(speedButtonPin, INPUT_PULLUP);
 
     Bounce2::Button* moveToConv = new Bounce2::Button();
-    moveToConv->interval(5);
+    moveToConv->interval(50);
     moveToConv->setPressedState(LOW);
     moveToConv->attach(moveToConversionButtonPin, INPUT_PULLUP);
 
