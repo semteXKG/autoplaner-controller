@@ -6,7 +6,7 @@ static const long INCREMENT_NORMAL_IN_DENOM = 1 * DENOMINATION;
 static const long INCREMENT_SLOW_IN_DENOM = DENOMINATION / 10;
 
 static const long MAX_POSITION = 210 * DENOMINATION;
-static const long MIN_POSITION = 8 * DENOMINATION;
+static const long MIN_POSITION = 5 * DENOMINATION;
 
 static const int PULSE_PER_MM = 800;
 static const int DENOM_PER_PULSE = 1250;

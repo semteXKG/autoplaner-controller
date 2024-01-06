@@ -19,6 +19,7 @@ class TargetSelector {
         void handleInputSelectionButton();
         void handleMoveToConversionButton();
         void correctAccidentalInputs();
+        long correctFractionValues(long targetPosition, long totalDelta, boolean isButtonPressed);
         boolean evaluateFastMode();
     public:
         TargetSelector(int pin1, int pin2, SharedData* sharedData);

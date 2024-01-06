@@ -56,9 +56,9 @@ void MenuHandler::handleEnterPressed() {
             break;
         case 1: 
             if (sharedData->isLocked()) {
-//                lockController->unlock(true);
+                sharedData->setLocked(false); 
             } else {
-//                lockController->lock(true);
+                sharedData->setLocked(true); 
             }
 
             sharedData->switchState(MachineState::IDLE);        

@@ -18,7 +18,7 @@ TargetSelector::~TargetSelector() {
 void TargetSelector::handleEncoder() {
 	sharedData->setLastRotation(0);
     // Loop and read the count
-	int newPos = encoder->getCount() / 4;
+	int newPos = round((double) encoder->getCount() / 4.0);
 
 	if(newPos == prevEncPosition) {
 		return;
@@ -27,9 +27,6 @@ void TargetSelector::handleEncoder() {
 	int32_t delta = newPos - prevEncPosition;	
 	sharedData->setLastRotation(delta);
 	prevEncPosition = newPos;	
-	
-	Serial.print("delta: ");
-	Serial.println(delta);
 
 	if(this->sharedData->getState() != MachineState::IDLE && this->sharedData->getState() != MachineState::SETTINGS_OFFSET_ADJUSTING) {
 		return;
@@ -39,32 +36,43 @@ void TargetSelector::handleEncoder() {
 
 	boolean fastMode = evaluateFastMode();
 	
-	long increment;
+	long factor;
 	if (sharedData->speedButton->isPressed()) {
-		increment =  INCREMENT_SLOW_IN_DENOM;
+		factor =  INCREMENT_SLOW_IN_DENOM;
 	} else if (fastMode) {
-		increment = INCREMENT_NORMAL_IN_DENOM * 2;
+		factor = INCREMENT_NORMAL_IN_DENOM * 2;
 	} else {
-		increment = INCREMENT_NORMAL_IN_DENOM;
+		factor = INCREMENT_NORMAL_IN_DENOM;
 	}
 
-	lastValues[currentInputPosition % MAX_INPUTS] = delta * increment;
+	long totalDelta = factor * delta;
+
+	lastValues[currentInputPosition % MAX_INPUTS] = totalDelta;
 	currentInputPosition++;
 
 	if(sharedData->getState() == MachineState::IDLE) {
-		sharedData->setTargetPosition(sharedData->getTargetPosition() + (delta * increment));
+		sharedData->setTargetPosition(sharedData->getTargetPosition() + totalDelta);
 	} else if (sharedData->getState() == MachineState::SETTINGS_OFFSET_ADJUSTING) {
-		sharedData->setOffset(sharedData->getOffset() + delta * increment);
+		sharedData->setOffset(sharedData->getOffset() + totalDelta);
 	}
 
 	sharedData->scheduleDisplayUpdate();
 }
 
+long TargetSelector::correctFractionValues(long targetPosition, long totalDelta, boolean isSLowEnabled) {
+	if (isSLowEnabled) {
+		return totalDelta;
+	}
+	int remainder = targetPosition % DENOMINATION;
+	if(remainder == 0) {
+		return totalDelta;
+	}
+	return totalDelta > 0 ? 
+				totalDelta + (DENOMINATION - remainder) : 
+				totalDelta - remainder;
+}
+
 boolean TargetSelector::evaluateFastMode() {
-//	Serial.print("Element: ");
-//	Serial.println(currentInputPosition % MAX_INPUTS);
-//	Serial.print("Last Index: ");
-//	Serial.println();
 	int lastIndex = (currentInputPosition-3) % MAX_INPUTS;
 	int currentIndex = (currentInputPosition) % MAX_INPUTS;
 	if(lastIndex < 0) {
@@ -73,8 +81,6 @@ boolean TargetSelector::evaluateFastMode() {
 	
 	long currentElement = lastTimestamps[currentIndex];
 	long prevElement = lastTimestamps[lastIndex];
-//	Serial.print("DIFF:");
-//	Serial.println(currentElement - prevElement);
 	return currentElement - prevElement < 200;
 }
 
